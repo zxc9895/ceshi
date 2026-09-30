@@ -153,7 +153,10 @@ ISSUER_PAGES = {
 def issuer_page(ticker):
     html = http_get(ISSUER_PAGES[ticker]).text
     tables = pd.read_html(io.StringIO(html))
-    dist = [t for t in tables if any("ex" in str(c).lower() for c in t.columns)]
+    # 要求列名像 "Ex-Date" / "Ex-Div Date"，单纯含 "ex" 会误中 "Index"
+    dist = [t.dropna(how="all") for t in tables
+            if any(re.search(r"\bex[-\s]?(div|date)", str(c).lower()) for c in t.columns)]
+    dist = [t for t in dist if not t.empty]
     if not dist:
         raise RuntimeError("页面里没找到分红表（可能靠 JS 动态加载）")
     return dist[0]
@@ -269,7 +272,7 @@ def main():
                    "ExDate", f"yahoo_{t.lower()}_dividends.csv")
         else:
             results[name]["reason"] = f"官网：{official_reason}；Yahoo 兜底：{results[name]['reason']}"
-        results[name]["consistency"] = "19a 返还本金比例：官网不可达，未取得"
+        results[name]["consistency"] = "19a 返还本金比例：官网未取得"
 
     # 6
     source("6", "东方财富", "510300 近1年日线")

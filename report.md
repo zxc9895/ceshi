@@ -6,23 +6,22 @@
 
 ## 结论
 
-- 8 个数据源（第 5 项按 JEPI/QYLD/SPYI 拆成 3 行，共 10 行）：0 行能用，10 行不能用。
-- 连 google.com / baidu.com 这种普通网站也被代理 403 拒绝，只有 pypi、GitHub 能通：说明这台云电脑实际生效的是「只放行包仓库和 GitHub」的受限网络，而不是 Full。问题不在这些数据源本身，要先改环境的网络设置（改完新开会话），再重跑本脚本。
+- 8 个数据源（第 5 项按 JEPI/QYLD/SPYI 拆成 3 行，共 10 行）：9 行能用，1 行不能用。
 
 ## 结果总表
 
 | # | 数据源 | 能不能用 | 拿到什么 | 起止日期 | 行数 | 失败原因 | 一致性结果 |
 |---|---|---|---|---|---|---|---|
-| 1 | Yahoo Finance | ❌ 不能 | 无（目标：SPY 近1年日线） | — | 0 | 代理拒绝连接（CONNECT 403，网络策略不放行 query*.finance.yahoo.com） | 无法比对：Yahoo Finance、Stooq 没拿到数据 |
-| 2 | Stooq | ❌ 不能 | 无（目标：SPY 近1年日线） | — | 0 | 代理拒绝连接（CONNECT 403，网络策略不放行 stooq.com） | 无法比对：Yahoo Finance、Stooq 没拿到数据 |
-| 3 | Ken French | ❌ 不能 | 无（目标：动量因子月度数据） | — | 0 | 代理拒绝连接（CONNECT 403，网络策略不放行 mba.tuck.dartmouth.edu） | — |
-| 4 | Cboe BXM | ❌ 不能 | 无（目标：BXM 全部历史日线） | — | 0 | 代理拒绝连接（CONNECT 403，网络策略不放行 cdn.cboe.com） | — |
-| 5a | 发行商分红 JEPI | ❌ 不能 | 无（目标：JEPI 近12个月每月分红） | — | 0 | 官网：代理拒绝连接（CONNECT 403，网络策略不放行 am.jpmorgan.com）；Yahoo 兜底：代理拒绝连接（CONNECT 403，网络策略不放行 query*.finance.yahoo.com） | 19a 返还本金比例：官网不可达，未取得 |
-| 5b | 发行商分红 QYLD | ❌ 不能 | 无（目标：QYLD 近12个月每月分红） | — | 0 | 官网：代理拒绝连接（CONNECT 403，网络策略不放行 www.globalxetfs.com）；Yahoo 兜底：代理拒绝连接（CONNECT 403，网络策略不放行 query*.finance.yahoo.com） | 19a 返还本金比例：官网不可达，未取得 |
-| 5c | 发行商分红 SPYI | ❌ 不能 | 无（目标：SPYI 近12个月每月分红） | — | 0 | 官网：代理拒绝连接（CONNECT 403，网络策略不放行 neosfunds.com）；Yahoo 兜底：代理拒绝连接（CONNECT 403，网络策略不放行 query*.finance.yahoo.com） | 19a 返还本金比例：官网不可达，未取得 |
-| 6 | 东方财富 | ❌ 不能 | 无（目标：510300 近1年日线） | — | 0 | 代理拒绝连接（CONNECT 403，网络策略不放行 push2his.eastmoney.com） | 无法比对：东方财富、新浪财经 没拿到数据 |
-| 7 | 新浪财经 | ❌ 不能 | 无（目标：510300 近1年日线） | — | 0 | 代理拒绝连接（CONNECT 403，网络策略不放行 finance.sina.com.cn） | 无法比对：东方财富、新浪财经 没拿到数据 |
-| 8 | 中证指数 | ❌ 不能 | 无（目标：沪深300成分股名单） | — | 0 | 代理拒绝连接（CONNECT 403，网络策略不放行 oss-ch.csindex.com.cn） | — |
+| 1 | Yahoo Finance | ✅ 能 | SPY 近1年日线（含 Close / Adj Close） | 2025-09-30 ~ 2026-09-29 | 251 | — | 无法比对：Stooq 没拿到数据 |
+| 2 | Stooq | ❌ 不能 | 无（目标：SPY 近1年日线） | — | 0 | 返回的不是 CSV：'<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"></head><body><noscript>T' | 无法比对：Stooq 没拿到数据 |
+| 3 | Ken French | ✅ 能 | Mom 动量因子月度收益（%） | 1927-01-01 ~ 2026-08-01 | 1196 | — | — |
+| 4 | Cboe BXM | ✅ 能 | BXM 指数全部历史日线 | 2002-03-22 ~ 2026-09-29 | 6167 | — | — |
+| 5a | 发行商分红 JEPI | ✅ 能 | JEPI 近12个月分红（来源：Yahoo，官网失败：No tables found） | 2025-10-01 ~ 2026-09-01 | 12 | — | 19a 返还本金比例：官网未取得 |
+| 5b | 发行商分红 QYLD | ✅ 能 | QYLD 近12个月分红（来源：Yahoo，官网失败：页面里没找到分红表（可能靠 JS 动态加载）） | 2025-10-20 ~ 2026-09-21 | 12 | — | 19a 返还本金比例：官网未取得 |
+| 5c | 发行商分红 SPYI | ✅ 能 | SPYI 分红表（来源：发行商官网） | — | 12 | — | — |
+| 6 | 东方财富 | ✅ 能 | 510300 近1年日线（不复权，akshare） | 2025-09-30 ~ 2026-09-30 | 242 | — | 东方财富 vs 新浪：重叠 240 天，一致 240 天（100.0%），最大差 0.000 个百分点（2025-10-09） |
+| 7 | 新浪财经 | ✅ 能 | 510300 近1年日线（不复权，akshare） | 2025-09-30 ~ 2026-09-29 | 241 | — | 东方财富 vs 新浪：重叠 240 天，一致 240 天（100.0%），最大差 0.000 个百分点（2025-10-09） |
+| 8 | 中证指数 | ✅ 能 | 沪深300当前成分股 | — | 300 | — | — |
 
 ## 对照组（判断是个别网站被挡，还是整体外网不通）
 
@@ -30,24 +29,32 @@
 |---|---|
 | https://pypi.org/simple/ | 通 |
 | https://api.github.com | 通 |
-| https://www.google.com | 不通：代理拒绝连接（CONNECT 403，网络策略不放行 www.google.com） |
-| https://example.com | 不通：代理拒绝连接（CONNECT 403，网络策略不放行 example.com） |
-| https://www.baidu.com | 不通：代理拒绝连接（CONNECT 403，网络策略不放行 www.baidu.com） |
+| https://www.google.com | 通 |
+| https://example.com | 通 |
+| https://www.baidu.com | 通 |
 
 ## 每次尝试的记录
 
-- **Yahoo Finance**：第1次：代理拒绝连接（CONNECT 403，网络策略不放行 query*.finance.yahoo.com）；第2次：代理拒绝连接（CONNECT 403，网络策略不放行 query*.finance.yahoo.com）；第3次：$SPY: possibly delisted; no timezone found
-- **Stooq**：第1次：代理拒绝连接（CONNECT 403，网络策略不放行 stooq.com）；第2次：代理拒绝连接（CONNECT 403，网络策略不放行 stooq.com）；第3次：代理拒绝连接（CONNECT 403，网络策略不放行 stooq.com）
-- **Ken French**：第1次：代理拒绝连接（CONNECT 403，网络策略不放行 mba.tuck.dartmouth.edu）；第2次：代理拒绝连接（CONNECT 403，网络策略不放行 mba.tuck.dartmouth.edu）；第3次：代理拒绝连接（CONNECT 403，网络策略不放行 mba.tuck.dartmouth.edu）
-- **Cboe BXM**：第1次：代理拒绝连接（CONNECT 403，网络策略不放行 cdn.cboe.com）；第2次：代理拒绝连接（CONNECT 403，网络策略不放行 cdn.cboe.com）；第3次：代理拒绝连接（CONNECT 403，网络策略不放行 cdn.cboe.com）
-- **发行商分红 JEPI**：官网 第1次：代理拒绝连接（CONNECT 403，网络策略不放行 am.jpmorgan.com）；官网 第2次：代理拒绝连接（CONNECT 403，网络策略不放行 am.jpmorgan.com）；官网 第3次：代理拒绝连接（CONNECT 403，网络策略不放行 am.jpmorgan.com）；Yahoo 第1次：代理拒绝连接（CONNECT 403，网络策略不放行 query*.finance.yahoo.com）；Yahoo 第2次：代理拒绝连接（CONNECT 403，网络策略不放行 query*.finance.yahoo.com）；Yahoo 第3次：代理拒绝连接（CONNECT 403，网络策略不放行 query*.finance.yahoo.com）
-- **发行商分红 QYLD**：官网 第1次：代理拒绝连接（CONNECT 403，网络策略不放行 www.globalxetfs.com）；官网 第2次：代理拒绝连接（CONNECT 403，网络策略不放行 www.globalxetfs.com）；官网 第3次：代理拒绝连接（CONNECT 403，网络策略不放行 www.globalxetfs.com）；Yahoo 第1次：代理拒绝连接（CONNECT 403，网络策略不放行 query*.finance.yahoo.com）；Yahoo 第2次：代理拒绝连接（CONNECT 403，网络策略不放行 query*.finance.yahoo.com）；Yahoo 第3次：代理拒绝连接（CONNECT 403，网络策略不放行 query*.finance.yahoo.com）
-- **发行商分红 SPYI**：官网 第1次：代理拒绝连接（CONNECT 403，网络策略不放行 neosfunds.com）；官网 第2次：代理拒绝连接（CONNECT 403，网络策略不放行 neosfunds.com）；官网 第3次：代理拒绝连接（CONNECT 403，网络策略不放行 neosfunds.com）；Yahoo 第1次：代理拒绝连接（CONNECT 403，网络策略不放行 query*.finance.yahoo.com）；Yahoo 第2次：代理拒绝连接（CONNECT 403，网络策略不放行 query*.finance.yahoo.com）；Yahoo 第3次：代理拒绝连接（CONNECT 403，网络策略不放行 query*.finance.yahoo.com）
-- **东方财富**：第1次：代理拒绝连接（CONNECT 403，网络策略不放行 push2his.eastmoney.com）；第2次：代理拒绝连接（CONNECT 403，网络策略不放行 push2his.eastmoney.com）；第3次：代理拒绝连接（CONNECT 403，网络策略不放行 push2his.eastmoney.com）
-- **新浪财经**：第1次：代理拒绝连接（CONNECT 403，网络策略不放行 finance.sina.com.cn）；第2次：代理拒绝连接（CONNECT 403，网络策略不放行 finance.sina.com.cn）；第3次：代理拒绝连接（CONNECT 403，网络策略不放行 finance.sina.com.cn）
-- **中证指数**：第1次：代理拒绝连接（CONNECT 403，网络策略不放行 oss-ch.csindex.com.cn）；第2次：代理拒绝连接（CONNECT 403，网络策略不放行 oss-ch.csindex.com.cn）；第3次：代理拒绝连接（CONNECT 403，网络策略不放行 oss-ch.csindex.com.cn）
+- **Yahoo Finance**：第1次：成功
+- **Stooq**：第1次：('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))；第2次：('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))；第3次：返回的不是 CSV：'<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"></head><body><noscript>T'
+- **Ken French**：第1次：成功
+- **Cboe BXM**：第1次：成功
+- **发行商分红 JEPI**：官网 第1次：No tables found；官网 第2次：No tables found；官网 第3次：No tables found；Yahoo 第1次：成功
+- **发行商分红 QYLD**：官网 第1次：页面里没找到分红表（可能靠 JS 动态加载）；官网 第2次：页面里没找到分红表（可能靠 JS 动态加载）；官网 第3次：页面里没找到分红表（可能靠 JS 动态加载）；Yahoo 第1次：成功
+- **发行商分红 SPYI**：第1次：成功
+- **东方财富**：第1次：HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57；第2次：成功
+- **新浪财经**：第1次：成功
+- **中证指数**：第1次：成功
 
 ## 样本文件
 
-- 无（所有源都没拿到数据）
+- `samples/yahoo_spy.csv`
+- `samples/french_momentum_monthly.csv`
+- `samples/cboe_bxm_history.csv`
+- `samples/yahoo_jepi_dividends.csv`
+- `samples/yahoo_qyld_dividends.csv`
+- `samples/issuer_spyi_dist.csv`
+- `samples/eastmoney_510300.csv`
+- `samples/sina_510300.csv`
+- `samples/csindex_hs300_cons.csv`
 - `samples/attempt_log.json`：完整尝试日志（含报错堆栈）
